@@ -1,0 +1,9 @@
+.env
+__pycache__/
+*.html
+test_*.py
+bpando.html
+bm_art.html
+bp_art.html
+brandingjournal.html
+bm_latest.html
