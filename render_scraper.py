@@ -15,8 +15,8 @@ load_dotenv()
 
 NOTION_TOKEN = os.getenv("NOTION_TOKEN")
 DATABASE_ID = os.getenv("NOTION_DATABASE_ID")
-TELEGRAM_TOKEN = "7537449069:AAH_CmfGnRNIg0h6x1k1dVNwj7U3HI6XkzE"
-CHAT_ID = "817335970"
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
+CHAT_ID = os.getenv("CHAT_ID")
 
 # --- Scraping Functions ---
 

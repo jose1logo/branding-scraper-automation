@@ -27,6 +27,8 @@ Create a new **Background Worker** on Render to keep the `/get` command alive:
 Add these to **all** services created on Render:
 - `NOTION_TOKEN`: Your Notion Internal Integration Token.
 - `NOTION_DATABASE_ID`: Your Notion Database ID.
+- `TELEGRAM_TOKEN`: 7537449069:AAH_CmfGnRNIg0h6x1k1dVNwj7U3HI6XkzE
+- `CHAT_ID`: 817335970
 
 ## Local Testing
 To test the bot locally:
