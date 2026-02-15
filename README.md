@@ -12,20 +12,22 @@ This repository contains an automated Branding News Scraper that runs as a singl
 
 ## Render Deployment (Single Service)
 
-### 1. Create a Background Worker
-On [Render](https://render.com), click **New +** and select **Background Worker**.
+### 1. Create a Web Service
+On [Render](https://render.com), click **New +** and select **Web Service**.
 
-### 2. Configure the Worker
+### 2. Configure the Service
 - **Connect Repository:** Select your `branding-scraper-automation` repo.
+- **Environment:** Select **Python**.
 - **Build Command:** `pip install -r requirements.txt`
 - **Start Command:** `python render_scraper.py`
 
 ### 3. Environment Variables
-Add these 4 variables in the **Environment** tab of your worker:
+Add these variables in the **Environment** tab of your service:
 - `NOTION_TOKEN`: (Your Notion Secret)
 - `NOTION_DATABASE_ID`: (Your Database ID)
-- `TELEGRAM_TOKEN`: ``
-- `CHAT_ID`: ``
+- `TELEGRAM_TOKEN`: 7537449069:AAH_CmfGnRNIg0h6x1k1dVNwj7U3HI6XkzE
+- `CHAT_ID`: 817335970
+- `PORT`: 10000 (Render usually sets this automatically)
 
 ## Telegram Command
 Once the worker is "Live", you can control the scraper from Telegram:

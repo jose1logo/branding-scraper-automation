@@ -4,3 +4,4 @@ python-dotenv
 aiogram
 apscheduler
 tzdata
+aiohttp

@@ -10,6 +10,7 @@ import asyncio
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from aiohttp import web
 
 # Load environment variables
 load_dotenv()
@@ -18,6 +19,7 @@ NOTION_TOKEN = os.getenv("NOTION_TOKEN")
 DATABASE_ID = os.getenv("NOTION_DATABASE_ID")
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
+PORT = os.getenv("PORT", "10000")
 
 # --- Scraping Functions ---
 
@@ -265,6 +267,11 @@ def run_sync(source_id):
         send_telegram_notif(f"Articles Were Added to the Database ✅ ({count} from {arts[0]['source']})")
     return count
 
+# --- Web Server Health Check ---
+
+async def handle_health(request):
+    return web.Response(text="Branding Scraper is Live and Healthy 🚀")
+
 # --- Main Bot & Scheduler Logic ---
 
 async def start_all():
@@ -276,9 +283,7 @@ async def start_all():
     scheduler = AsyncIOScheduler(timezone=damascus_tz)
 
     # Define Automated Schedules (Damascus Time)
-    # Daily scrape for Brand New at 6 AM
     scheduler.add_job(lambda: run_sync(1), 'cron', hour=6, minute=0)
-    # Weekly scrape for others on Sunday at 6 AM
     scheduler.add_job(lambda: [run_sync(i) for i in [2,3,4]], 'cron', day_of_week='sun', hour=6, minute=0)
     
     scheduler.start()
@@ -296,6 +301,17 @@ async def start_all():
         else:
             await message.answer(f"✅ Finished! Added {total} articles across all platforms.")
 
+    # Setup Web App for Render Health Checks
+    app = web.Application()
+    app.router.add_get('/', handle_health)
+    
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, '0.0.0.0', PORT)
+    
+    print(f"Starting web server on port {PORT}...")
+    await site.start()
+    
     print("Bot and Scheduler are running...")
     await dp.start_polling(bot)
 
