@@ -4,9 +4,9 @@ This repository contains an automated Branding News Scraper that runs as a singl
 
 ## Features
 - **All-in-One Instance:** Runs the Telegram Bot and Automated Scheduler in a single process.
-- **Automated Schedule:** 
-  - **Daily (9 AM UTC):** Brand New.
-  - **Weekly (Monday 10 AM UTC):** Branding Journal, Branding Mag, and BP&O.
+- **Automated Schedule (Damascus Time):** 
+  - **Daily (6 AM):** Brand New.
+  - **Weekly (Sunday 6 AM):** Branding Journal, Branding Mag, and BP&O.
 - **Telegram Command:** Send `/get` to the bot to trigger an instant sync of all 4 sources.
 - **Database:** All articles are synced to Notion with full text and images.
 
@@ -24,8 +24,8 @@ On [Render](https://render.com), click **New +** and select **Background Worker*
 Add these 4 variables in the **Environment** tab of your worker:
 - `NOTION_TOKEN`: (Your Notion Secret)
 - `NOTION_DATABASE_ID`: (Your Database ID)
-- `TELEGRAM_TOKEN`: `7537449069:AAH_CmfGnRNIg0h6x1k1dVNwj7U3HI6XkzE`
-- `CHAT_ID`: `817335970`
+- `TELEGRAM_TOKEN`: ``
+- `CHAT_ID`: ``
 
 ## Telegram Command
 Once the worker is "Live", you can control the scraper from Telegram:

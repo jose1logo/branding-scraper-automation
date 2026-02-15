@@ -268,15 +268,18 @@ def run_sync(source_id):
 # --- Main Bot & Scheduler Logic ---
 
 async def start_all():
+    from zoneinfo import ZoneInfo
+    damascus_tz = ZoneInfo("Asia/Damascus")
+    
     bot = Bot(token=TELEGRAM_TOKEN)
     dp = Dispatcher()
-    scheduler = AsyncIOScheduler()
+    scheduler = AsyncIOScheduler(timezone=damascus_tz)
 
-    # Define Automated Schedules
-    # Daily scrape for Brand New at 9 AM UTC
-    scheduler.add_job(lambda: run_sync(1), 'cron', hour=9, minute=0)
-    # Weekly scrape for others on Monday at 10 AM UTC
-    scheduler.add_job(lambda: [run_sync(i) for i in [2,3,4]], 'cron', day_of_week='mon', hour=10, minute=0)
+    # Define Automated Schedules (Damascus Time)
+    # Daily scrape for Brand New at 6 AM
+    scheduler.add_job(lambda: run_sync(1), 'cron', hour=6, minute=0)
+    # Weekly scrape for others on Sunday at 6 AM
+    scheduler.add_job(lambda: [run_sync(i) for i in [2,3,4]], 'cron', day_of_week='sun', hour=6, minute=0)
     
     scheduler.start()
 
