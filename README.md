@@ -1,38 +1,32 @@
-# Branding Scraper Automation (Render + Telegram)
+# Branding Scraper Automation (All-in-One Instance)
 
-This repository contains the automated version of the Branding & Rebranding News Scraper, designed to run on Render with Telegram notifications.
+This repository contains an automated Branding News Scraper that runs as a single instance on Render. It handles both automated schedules and an interactive Telegram bot.
 
 ## Features
-- **Daily Scrapes:** UnderConsideration (Brand New).
-- **Weekly Scrapes:** Branding Journal, Branding Mag, and BP&O.
-- **Telegram Bot:** Send `/get` to the bot to trigger an instant sync of all sources.
-- **Notifications:** Automatic messages sent when new articles are added to Notion.
+- **All-in-One Instance:** Runs the Telegram Bot and Automated Scheduler in a single process.
+- **Automated Schedule:** 
+  - **Daily (9 AM UTC):** Brand New.
+  - **Weekly (Monday 10 AM UTC):** Branding Journal, Branding Mag, and BP&O.
+- **Telegram Command:** Send `/get` to the bot to trigger an instant sync of all 4 sources.
+- **Database:** All articles are synced to Notion with full text and images.
 
-## Render Setup
+## Render Deployment (Single Service)
 
-### 1. Cron Jobs (Scheduled Scrapes)
-Create a new **Cron Job** on Render for each schedule you want:
-- **Daily (Brand New):**
-  - Command: `python render_scraper.py --source 1`
-  - Schedule: `0 9 * * *`
-- **Weekly (Others):**
-  - Command: `python render_scraper.py --source 2` (or 3, or 4)
-  - Schedule: `0 10 * * 1` (Every Monday)
+### 1. Create a Background Worker
+On [Render](https://render.com), click **New +** and select **Background Worker**.
 
-### 2. Background Worker (Telegram Bot)
-Create a new **Background Worker** on Render to keep the `/get` command alive:
-- Command: `python render_scraper.py --bot`
+### 2. Configure the Worker
+- **Connect Repository:** Select your `branding-scraper-automation` repo.
+- **Build Command:** `pip install -r requirements.txt`
+- **Start Command:** `python render_scraper.py`
 
 ### 3. Environment Variables
-Add these to **all** services created on Render:
-- `NOTION_TOKEN`: Your Notion Internal Integration Token.
-- `NOTION_DATABASE_ID`: Your Notion Database ID.
-- `TELEGRAM_TOKEN`: 7537449069:AAH_CmfGnRNIg0h6x1k1dVNwj7U3HI6XkzE
-- `CHAT_ID`: 817335970
+Add these 4 variables in the **Environment** tab of your worker:
+- `NOTION_TOKEN`: (Your Notion Secret)
+- `NOTION_DATABASE_ID`: (Your Database ID)
+- `TELEGRAM_TOKEN`: `7537449069:AAH_CmfGnRNIg0h6x1k1dVNwj7U3HI6XkzE`
+- `CHAT_ID`: `817335970`
 
-## Local Testing
-To test the bot locally:
-```bash
-pip install -r requirements.txt
-python render_scraper.py --bot
-```
+## Telegram Command
+Once the worker is "Live", you can control the scraper from Telegram:
+- **/get**: Force the bot to check all 4 sites immediately and sync new articles to Notion.

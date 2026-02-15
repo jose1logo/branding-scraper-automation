@@ -9,6 +9,7 @@ import re
 import asyncio
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 # Load environment variables
 load_dotenv()
@@ -264,17 +265,26 @@ def run_sync(source_id):
         send_telegram_notif(f"Articles Were Added to the Database ✅ ({count} from {arts[0]['source']})")
     return count
 
-# --- Telegram Bot Handler ---
+# --- Main Bot & Scheduler Logic ---
 
-async def start_bot():
+async def start_all():
     bot = Bot(token=TELEGRAM_TOKEN)
     dp = Dispatcher()
+    scheduler = AsyncIOScheduler()
+
+    # Define Automated Schedules
+    # Daily scrape for Brand New at 9 AM UTC
+    scheduler.add_job(lambda: run_sync(1), 'cron', hour=9, minute=0)
+    # Weekly scrape for others on Monday at 10 AM UTC
+    scheduler.add_job(lambda: [run_sync(i) for i in [2,3,4]], 'cron', day_of_week='mon', hour=10, minute=0)
+    
+    scheduler.start()
 
     @dp.message(Command("get"))
     async def handle_get(message: types.Message):
         if str(message.from_user.id) != CHAT_ID:
             return
-        await message.answer("🔄 Starting sync for all sources...")
+        await message.answer("🔄 Starting full sync for all 4 sources...")
         total = 0
         for i in range(1, 5):
             total += run_sync(i)
@@ -283,18 +293,8 @@ async def start_bot():
         else:
             await message.answer(f"✅ Finished! Added {total} articles across all platforms.")
 
-    print("Bot is listening...")
+    print("Bot and Scheduler are running...")
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--source", type=int, help="1: Brand New, 2: Journal, 3: Mag, 4: BP&O")
-    parser.add_argument("--bot", action="store_true", help="Start the Telegram bot listener")
-    args = parser.parse_args()
-
-    if args.bot:
-        asyncio.run(start_bot())
-    elif args.source:
-        run_sync(args.source)
-    else:
-        print("Please specify --source X or --bot")
+    asyncio.run(start_all())
