@@ -25,8 +25,8 @@ On [Render](https://render.com), click **New +** and select **Web Service**.
 Add these variables in the **Environment** tab of your service:
 - `NOTION_TOKEN`: (Your Notion Secret)
 - `NOTION_DATABASE_ID`: (Your Database ID)
-- `TELEGRAM_TOKEN`: 7537449069:AAH_CmfGnRNIg0h6x1k1dVNwj7U3HI6XkzE
-- `CHAT_ID`: 817335970
+- `TELEGRAM_TOKEN`: 
+- `CHAT_ID`: 
 - `PORT`: 10000 (Render usually sets this automatically)
 
 ## Telegram Command
