@@ -219,7 +219,7 @@ def upload_to_notion(article):
         "properties": {
             "Name": {"title": [{"text": {"content": article['title']}}]},
             "URL": {"url": article['link']},
-            "Status": {"select": {"name": "Published"}},
+            "Status": {"select": {"name": "Not Published"}},
             "Platform": {"select": {"name": "Web"}},
             "Date": {"date": {"start": article['date']}}
         },
