@@ -51,15 +51,41 @@ def get_brand_new_articles(start_date, end_date):
         if start_date <= current_date <= end_date:
             modules = section.find_all('div', class_='module')
             for module in modules:
-                title_link = module.find(['h1', 'h2'])
-                link_tag = title_link.find('a', href=True) if title_link else None
+                link_tag = module.find('a', href=re.compile(r'brandnew/archives/.*\.php'))
                 if not link_tag:
-                    link_tag = module.find('a', href=re.compile(r'brandnew/archives/.*\.php'))
+                    title_link = module.find(['h1', 'h2'])
+                    link_tag = title_link.find('a', href=True) if title_link else None
 
                 if link_tag:
-                    title = link_tag.get_text(strip=True)
                     link = link_tag['href']
                     if '/category/' in link or link.endswith('#respond'): continue
+                    
+                    # Better title extraction
+                    h1 = module.find('h1')
+                    h2 = module.find('h2')
+                    
+                    h1_text = ""
+                    if h1:
+                        h1_copy = BeautifulSoup(str(h1), 'html.parser')
+                        for span in h1_copy.find_all('span', class_='homepage_editorial_category'):
+                            span.decompose()
+                        h1_text = h1_copy.get_text(strip=True)
+                        
+                    h2_text = ""
+                    if h2:
+                        h2_copy = BeautifulSoup(str(h2), 'html.parser')
+                        for span in h2_copy.find_all('span', class_='homepage_editorial_category'):
+                            span.decompose()
+                        h2_text = h2_copy.get_text(strip=True)
+                    
+                    generic_cats = ["Quirky", "News", "Nice", "Job Board", "Linked"]
+                    if any(cat == h2_text for cat in generic_cats) and h1_text:
+                        title = h1_text
+                    elif h2_text:
+                        title = h2_text
+                    else:
+                        title = h1_text or link_tag.get_text(strip=True)
+
                     articles.append({"title": title, "link": link, "date": current_date.isoformat(), "source": "Brand New"})
     return articles
 
