@@ -22,6 +22,14 @@ TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
 PORT = os.getenv("PORT", "10000")
 
+# Notion "Blog Name" mapping (source -> option name in your Notion column)
+BLOG_NAME_MAP = {
+    "Branding Mag": "Brand Mag",
+    "Brand New": "underconsideration",
+    "Branding Journal": "Branding Journal",
+    "BP&O": "Bpando",
+}
+
 # --- Scraping Functions ---
 
 def get_brand_new_articles(start_date, end_date):
@@ -262,15 +270,21 @@ def upload_to_notion(article):
     content_blocks = get_article_content(article['link'], article['source'])
     url = "https://api.notion.com/v1/pages"
     headers = {"Authorization": f"Bearer {NOTION_TOKEN}", "Content-Type": "application/json", "Notion-Version": "2022-06-28"}
+    blog_name = BLOG_NAME_MAP.get(article.get('source'))
+    properties = {
+        "Name": {"title": [{"text": {"content": article['title']}}]},
+        "URL": {"url": article['link']},
+        "Status": {"select": {"name": "Not Published"}},
+        "Platform": {"select": {"name": "Web"}},
+        "Date": {"date": {"start": article['date']}}
+    }
+    if blog_name:
+        # Prefer tag-style storage using multi_select for the "Blog Name" column.
+        properties["Blog Name"] = {"multi_select": [{"name": blog_name}]}
+
     data = {
         "parent": {"database_id": DATABASE_ID},
-        "properties": {
-            "Name": {"title": [{"text": {"content": article['title']}}]},
-            "URL": {"url": article['link']},
-            "Status": {"select": {"name": "Not Published"}},
-            "Platform": {"select": {"name": "Web"}},
-            "Date": {"date": {"start": article['date']}}
-        },
+        "properties": properties,
         "children": content_blocks
     }
     try:
@@ -397,7 +411,9 @@ async def start_all():
     await site.start()
     
     print("Bot and Scheduler are running...")
+    # Ensure no webhook is active before polling
     await bot.delete_webhook(drop_pending_updates=True)
+    await asyncio.sleep(1) # Give Telegram a moment to process the deletion
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
